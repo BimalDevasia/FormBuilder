@@ -14,13 +14,33 @@ import FieldProperties from './FieldProperties';
 import FormManager from './FormManager';
 import type { DragEndEvent } from '@dnd-kit/core';
 
+// Separate component to prevent recreating on every render
+const FieldPaletteContent: React.FC = () => (
+  <Paper
+    elevation={0}
+    sx={{
+      height: '100%',
+      borderRadius: 0,
+      backgroundColor: 'background.paper',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden',
+    }}
+  >
+    <FieldPalette />
+  </Paper>
+);
+
 const FormBuilderLayout: React.FC = () => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
   const [formManagerOpen, setFormManagerOpen] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const { fields, selectedFieldId } = useSelector((state: RootState) => state.formBuilder);
+  
+  // Use specific selectors to avoid unnecessary re-renders
+  const fields = useSelector((state: RootState) => state.formBuilder.fields);
+  const selectedFieldId = useSelector((state: RootState) => state.formBuilder.selectedFieldId);
   
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -65,25 +85,6 @@ const FormBuilderLayout: React.FC = () => {
       }
     }
   };
-
-
-
-  // Field Palette Content Component
-  const FieldPaletteContent = () => (
-    <Paper
-      elevation={0}
-      sx={{
-        height: '100%',
-        borderRadius: 0,
-        backgroundColor: 'background.paper',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-      }}
-    >
-      <FieldPalette />
-    </Paper>
-  );
 
   return (
     <DndContext
